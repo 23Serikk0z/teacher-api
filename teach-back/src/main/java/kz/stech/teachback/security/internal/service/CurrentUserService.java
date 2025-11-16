@@ -1,4 +1,4 @@
-package kz.stech.teachback.security.service;
+package kz.stech.teachback.security.internal.service;
 
 import kz.stech.teachback.security.api.SecurityFacade;
 import kz.stech.teachback.shared.dto.UserDto;

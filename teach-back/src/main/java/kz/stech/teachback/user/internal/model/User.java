@@ -1,4 +1,4 @@
-package kz.stech.teachback.user.model;
+package kz.stech.teachback.user.internal.model;
 
 
 import jakarta.persistence.*;

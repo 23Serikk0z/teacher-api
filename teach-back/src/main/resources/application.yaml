@@ -1,4 +1,3 @@
-
 spring:
   application:
     name: teach-back
@@ -25,5 +24,8 @@ spring:
 
 server:
   port: 8888
-  servlet:
-    context-path: /api
+
+scalar:
+  enabled: true
+  dark-mode: true
+  layout: modern

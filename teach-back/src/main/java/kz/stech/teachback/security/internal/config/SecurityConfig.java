@@ -1,4 +1,4 @@
-package kz.stech.teachback.security;
+package kz.stech.teachback.security.internal.config;
 
 
 import org.springframework.context.annotation.Bean;
@@ -20,9 +20,11 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/scalar", "/scalar/**").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable);
 

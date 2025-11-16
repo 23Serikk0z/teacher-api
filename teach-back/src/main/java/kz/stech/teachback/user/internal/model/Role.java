@@ -1,4 +1,4 @@
-package kz.stech.teachback.user.model;
+package kz.stech.teachback.user.internal.model;
 
 
 import jakarta.persistence.*;
@@ -17,7 +17,10 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, unique = true)
-    private ERole name;
+    @Column(unique = true)
+    private String code;
+
+    private String ruName;
+
+    private String kkName;
 }

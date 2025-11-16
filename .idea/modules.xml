@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/teach-back.main.iml" filepath="$PROJECT_DIR$/.idea/modules/teach-back.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/teacher-api.iml" filepath="$PROJECT_DIR$/teacher-api.iml" />
     </modules>
   </component>
