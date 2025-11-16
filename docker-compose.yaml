@@ -1,4 +1,9 @@
+version: '3.9'
+
 services:
+  # ──────────────────────────────
+  #  ТВОЙ POSTGRES — НЕ ТРОГАЮ
+  # ──────────────────────────────
   postgres:
     image: postgres:16
     container_name: keycloak_postgres_teacher_api
@@ -11,6 +16,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  # ──────────────────────────────
+  #  ТВОЙ KEYCLOAK — НЕ ТРОГАЮ
+  # ──────────────────────────────
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.5
     container_name: keycloak_teacher_api
@@ -26,5 +34,68 @@ services:
     depends_on:
       - postgres
     command: ["start-dev"]
+    volumes:
+      - ./k-provider:/opt/keycloak/providers
+
+  # ──────────────────────────────
+  #  KAFKA + ZOOKEEPER + UI — ИСПРАВЛЕНО И ОПТИМИЗИРОВАНО
+  # ──────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data     # ← добавь
+      - zookeeper_logs:/var/lib/zookeeper/log      # ← добавь (необязательно, но хорошо)
+
+  kafka:
+    image: confluentinc/cp-kafka:7.7.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"          # с хоста
+      - "29092:29092"        # изнутри сети
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      # Два листенера — чтобы и изнутри сети, и снаружи работало
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      # single-node режим
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:29092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+  # Самый красивый UI 2025 года
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v2.5.0
+    container_name: redpanda-console
+    restart: unless-stopped
+    ports:
+      - "8081:8080"                  # 8080 занят Keycloak → ставим 8081
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKERS: kafka:29092     # ← вот так, просто и надёжно
+
 volumes:
   postgres_data:
+  zookeeper_data: # ← новый том
+  zookeeper_logs:       # ← новый том (можно без него)
+  kafka_data:           # ← новый том — самый главный

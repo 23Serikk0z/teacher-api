@@ -1,0 +1,43 @@
+import org.gradle.api.JavaVersion
+
+plugins {
+    id 'java'
+}
+
+group = 'kz.ser'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.keycloak:keycloak-core:24.0.5'
+    compileOnly 'org.keycloak:keycloak-server-spi:24.0.5'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:24.0.5'
+    compileOnly 'org.keycloak:keycloak-services:24.0.5'
+
+    implementation 'org.apache.kafka:kafka-clients:3.6.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+}
+
+
+jar {
+    archiveBaseName = 'keycloak-kafka-event-listener'
+    archiveVersion = version
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE   // ← вот эта строчка решает всё
+
+    manifest {
+        attributes 'Implementation-Title': 'Keycloak Kafka Event Listener',
+                'Implementation-Version': archiveVersion
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

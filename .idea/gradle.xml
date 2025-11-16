@@ -4,6 +4,15 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/keycloak-custom-provider" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../ProgramData/chocolatey/lib/gradle/tools/gradle-9.1.0" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/keycloak-custom-provider" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/teach-back" />
         <option name="modules">
           <set>
