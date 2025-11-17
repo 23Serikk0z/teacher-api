@@ -27,8 +27,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/teacher-api:latest ./backend
+          docker build -t ghcr.io/23serikk0z/teacher-api:latest ./backend
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/teacher-api:latest
+          docker push ghcr.io/23serikk0z/teacher-api:latest
