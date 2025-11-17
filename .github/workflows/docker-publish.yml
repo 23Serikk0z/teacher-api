@@ -25,10 +25,11 @@ jobs:
           distribution: temurin
 
       - name: Grant execute permission for Gradle wrapper
-        run: chmod +x teach-back/gradlew
+        run: chmod +x ./teach-back/gradlew
 
       - name: Build Spring Boot JAR
-        run: ./teach-back/gradlew clean bootJar -x test
+        run: ./gradlew clean bootJar -x test
+        working-directory: ./teach-back
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
