@@ -3,19 +3,23 @@ FROM eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app
 
-# Копируем Gradle wrapper и конфиги
-COPY teach-back/gradlew teach-back/gradle ./gradle/
-COPY teach-back/build.gradle teach-back/settings.gradle ./
+# Копируем Gradle wrapper и конфиги (пути относительные к контексту!)
+COPY gradlew gradlew
+COPY gradle gradle
+COPY build.gradle build.gradle
+COPY settings.gradle settings.gradle
 
 RUN chmod +x gradlew
 RUN ./gradlew build -x test || true
 
 # Копируем весь исходный код
-COPY teach-back/. .
+COPY . .
 
 RUN ./gradlew clean bootJar -x test
 
-# Стадия runtime
+# ──────────────────────────────
+# Финальный образ
+# ──────────────────────────────
 FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
