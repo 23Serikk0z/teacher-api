@@ -20,6 +20,7 @@ import java.util.UUID;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(unique = true)
@@ -29,6 +30,7 @@ public class User {
 
     private String lastName;
 
+    private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

@@ -10,15 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class UserDto {
-
     private UUID id;
     private String username;
     private Set<String> roles;
-    private String firstName;
-    private String lastName;
-
-
-    public String getFullName() {
-        return this.firstName + " " + this.lastName;
-    }
 }

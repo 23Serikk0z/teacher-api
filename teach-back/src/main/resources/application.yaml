@@ -3,25 +3,21 @@ spring:
     name: teach-back
 
   datasource:
-    url: jdbc:postgresql://postgres:5432/animal
-    username: animal
-    password: animal
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
     hikari:
       maximum-pool-size: 30
     driver-class-name: org.postgresql.Driver
 
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://keycloak:8080/realms/teach-realm
   jpa:
     hibernate:
       ddl-auto: none
     database: postgresql
     show-sql: true
 
+  flyway:
+    baseline-on-migrate: true
 server:
   port: 8888
 

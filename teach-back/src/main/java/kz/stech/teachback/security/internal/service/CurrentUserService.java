@@ -5,7 +5,6 @@ import kz.stech.teachback.shared.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -13,23 +12,23 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class CurrentUserService implements SecurityFacade {
 
-
     @Override
     public UUID getCurrentUserId() {
-        return UUID.fromString(getClaim("sub"));
+        String sub = getClaim("sub");
+        if (sub == null) {
+            throw new RuntimeException("User ID (sub) not found in JWT");
+        }
+        return UUID.fromString(sub);
     }
 
     @Override
     public Set<String> getRoles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null) {
-            return Set.of();
-        }
+        Authentication authentication = getAuthentication();
+        if (authentication == null) return Set.of();
 
         return authentication.getAuthorities()
                 .stream()
@@ -40,19 +39,23 @@ public class CurrentUserService implements SecurityFacade {
 
     @Override
     public String getCurrentUserName() {
-        return getClaim("preferred_username", getClaim("sub"));
+        return getClaim("username", getClaim("sub", "unknown"));
     }
 
     @Override
     public UserDto getCurrentUser() {
-
         return new UserDto(
-                this.getCurrentUserId(),
-                this.getCurrentUserName(),
-                this.getRoles(),
-                this.getClaim("given_name"),
-                this.getClaim("family_name")
+                getCurrentUserId(),
+                getCurrentUserName(),
+                getRoles()
         );
+    }
+
+
+    private Authentication getAuthentication() {
+        return org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication();
     }
 
     private String getClaim(String claim) {
@@ -60,9 +63,10 @@ public class CurrentUserService implements SecurityFacade {
     }
 
     private String getClaim(String claim, String fallback) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
-            return (String) jwtAuthenticationToken.getToken().getClaim(claim);
+        Authentication authentication = getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            Object value = jwtAuth.getToken().getClaim(claim);
+            return value != null ? value.toString() : fallback;
         }
         return fallback;
     }
